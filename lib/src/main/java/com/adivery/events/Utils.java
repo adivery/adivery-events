@@ -34,6 +34,7 @@ public class Utils {
             conn.setInstanceFollowRedirects(true);
             conn.setRequestProperty("Connection", "close");
             conn.setRequestMethod("GET");
+            conn.setRequestProperty("sdk_version", BuildConfig.SDK_VERSION);
             conn.getResponseCode();
         } catch (Exception e) {
             Logger.error("Failed to get url", e);

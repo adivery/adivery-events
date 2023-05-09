@@ -15,6 +15,8 @@ import java.util.concurrent.Executors;
 
 public class AdiveryUserEvents {
 
+  private static CartManager cartManager;
+
   public static void logEvent(Event event) {
     executor.execute(() -> logEventImmediate(event));
   }
@@ -39,16 +41,16 @@ public class AdiveryUserEvents {
     Uri.Builder builder = Uri.parse("https://events.adivery.com/api/v1/user-event").buildUpon();
 
     if (!TextUtils.isEmpty(event.name)) {
-      builder.appendQueryParameter("name", event.name);
+      builder.appendQueryParameter("event_name", event.name);
     }
 
-    builder.appendQueryParameter("app", appId);
+    builder.appendQueryParameter("app_token", appId);
 
     if (!TextUtils.isEmpty(AdiveryUserEvents.advertisingId)) {
       builder.appendQueryParameter("gps_adid", AdiveryUserEvents.advertisingId);
     }
 
-    builder.appendQueryParameter("uid", UUID.randomUUID().toString());
+    builder.appendQueryParameter("uid", event.uid);
 
     for (Map.Entry<String, String> entry : event.params.entrySet()) {
       String key = entry.getKey();
@@ -61,6 +63,7 @@ public class AdiveryUserEvents {
       builder.appendQueryParameter("p." + key, value);
     }
 
+    Logger.debug(builder.build().toString());
     return builder.build().toString();
   }
 
@@ -69,19 +72,24 @@ public class AdiveryUserEvents {
 
   private static volatile Executor executor;
 
-  public static void configure(Application application, String appId) {
+  static CartManager getCartManager() {
+    return cartManager;
+  }
+
+  public static void configure(Application application, String appToken) {
     if (executor == null) {
+      cartManager = new CartManager();
       synchronized (AdiveryUserEvents.class) {
         if (executor == null) {
           if (application == null) {
             throw new NullPointerException("Application is null");
           }
 
-          if (TextUtils.isEmpty(appId)) {
+          if (TextUtils.isEmpty(appToken)) {
             throw new NullPointerException("App id is null or empty");
           }
 
-          AdiveryUserEvents.appId = appId;
+          AdiveryUserEvents.appId = appToken;
 
           executor = Executors.newSingleThreadExecutor();
           executor.execute(

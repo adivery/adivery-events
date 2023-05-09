@@ -50,6 +50,7 @@ public class AdvertisingId {
             if (didBind) {
                 GoogleAdvertisingInfo advertisingInfo =
                         GoogleAdvertisingInfo.GoogleAdvertisingInfoBinder.create(connection.getBinder());
+                Logger.debug("advertising id: " + advertisingInfo.getId());
                 this.advertisingIdentifier = advertisingInfo.getId();
                 advertisingInfo.getEnabled(true);
             }

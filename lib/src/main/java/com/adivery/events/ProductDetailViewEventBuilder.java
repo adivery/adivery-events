@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class ProductDetailViewEventBuilder implements EventBuilder {
-    public enum Currency {
-        IRT
-    }
 
     private String sku;
     private String title;
